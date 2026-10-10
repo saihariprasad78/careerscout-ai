@@ -1,0 +1,23 @@
+# Local credentials and environment files
+.env
+.env.*
+**/.env
+**/.env.*
+!.env.example
+!**/.env.example
+
+# Virtual environments and generated Python files
+.venv/
+**/.venv/
+venv/
+**/venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Common private key and certificate files
+*.pem
+*.p12
+*.key

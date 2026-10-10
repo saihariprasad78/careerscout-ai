@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f5f0"><title>CareerScout — fresher job verifier</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <header class="topbar"><a class="brand" href="/" aria-label="CareerScout home"><span class="brand-mark">C</span> careerscout<span class="brand-ai">.ai</span></a><span class="live"><i></i> SERPAPI LIVE SEARCH</span></header>
+  <main>
+    <section class="hero"><p class="eyebrow">A clearer first step</p><h1>Find your first role.<br><em>Check the signals.</em></h1><p class="intro">Search Google Jobs through SerpApi and review the original listing evidence. Caution signals are prompts to verify, never a verdict.</p>
+      <form id="search-form"><label>Role or skill<input id="role" value="Python Intern" maxlength="100" required></label><label>Preferred location<input id="location" value="Bengaluru, India" maxlength="100" required></label><button id="submit" type="submit"><span>Search jobs</span><b>↗</b></button></form>
+      <div class="source-note"><span>01</span><span>Google Jobs results via SerpApi</span><span class="dot">·</span><span>India</span></div>
+    </section>
+    <section id="results" class="results" aria-live="polite"><div class="empty"><div class="empty-icon">↘</div><p>Start with a role you’re curious about.</p><small>Live listings and their evidence links will appear here.</small></div></section>
+  </main>
+  <footer><span>CAREERSCOUT AI <i>©</i> 2026</span><span>Signals are informational. Always verify with the employer.</span></footer>
+  <script src="/static/app.js" defer></script>
+</body></html>
