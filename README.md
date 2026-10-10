@@ -58,12 +58,16 @@ Results can be incomplete, stale, duplicated, or unavailable and depend on SerpA
 
 ## Three-minute demo
 
-1. **0:00–0:25 — Introduce the problem:** show the search page and explain that freshers need to inspect listings and their source evidence.
-2. **0:25–0:50 — Start locally:** show the app at `http://127.0.0.1:8000` and the role/location fields.
-3. **0:50–1:35 — Run a live search:** search `Python Intern` in `Bengaluru, India`; show the current result count and cards. Results can change between runs.
-4. **1:35–2:15 — Open one dossier:** choose one job and click **Investigate this job** (this makes one Google Search request); inspect the real source links/snippets, cautions, unknowns, and checklist.
-5. **2:15–2:45 — Explain the limits:** snippets are leads, not verification; no warning sign is not proof of safety. Open a source if time permits.
-6. **2:45–3:00 — Close:** mention SerpApi quota and the need to verify with the employer.
+## Two-minute demo
+
+1. **0:00–0:20 — Introduction:** Introduce CareerScout AI and explain the problem it solves for freshers.
+2. **0:20–0:45 — Search:** Show the job role and location fields.
+3. **0:45–1:20 — Job listings:** Demonstrate the job search results and listing cards.
+4. **1:20–2:00 — Investigate a job:** Show the evidence dossier, source links, cautions, unknowns, and checklist.
+5. **2:00–2:16 — Conclusion:** Explain that the tool helps freshers investigate job listings but cannot guarantee job legitimacy.
+6. ## Demo Video
+[Watch CareerScout AI Demo]
+link- https://drive.google.com/file/d/1gmLGhxxAJ6qs07EH6xsNrcRCEiAQczs0/view?usp=sharing
 
 ## Tests
 
