@@ -58,6 +58,53 @@ def normalize_job(job: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def normalize_dossier(data: dict[str, Any]) -> dict[str, Any]:
+    """Keep only real, linkable Google organic results and state their limits."""
+    organic = data.get("organic_results")
+    if not isinstance(organic, list):
+        organic = []
+    sources = []
+    for result in organic[:10]:
+        if not isinstance(result, dict) or not _is_http_url(result.get("link")):
+            continue
+        snippet = result.get("snippet")
+        sources.append({
+            "title": str(result.get("title") or "Title not provided")[:300],
+            "source": str(result.get("source") or "")[:200],
+            "url": result["link"],
+            "snippet": str(snippet or "Snippet not provided")[:1200],
+            "supports": "This search result may provide context about the employer or listing. Its title and snippet alone do not verify that the employer posted this role or that it is still open.",
+        })
+    cautions = []
+    combined = " ".join(f"{item['title']} {item['snippet']}" for item in sources).lower()
+    if re.search(r"\b(registration|application|training|security) fee\b|pay (?:to|for) (?:apply|the job)", combined):
+        cautions.append("A returned search snippet mentions an upfront fee. Independently verify the source and employer before paying anything.")
+    if re.search(r"\b(whatsapp|telegram)\b", combined) and re.search(r"\b(apply|contact|message|send)\b", combined):
+        cautions.append("A returned snippet mentions WhatsApp or Telegram in an application context. Verify the contact through the employer's official site.")
+    if not sources:
+        cautions.append("No matching linkable sources were returned. Missing search results are not evidence that the employer or listing is illegitimate.")
+    if sources and not cautions:
+        cautions.append("No specific fee or messaging warning phrase was found in the returned snippets. That is not proof the listing is safe.")
+    return {
+        "engine": "google",
+        "result_count": len(sources),
+        "sources": sources,
+        "cautions": cautions,
+        "unknowns": [
+            "Search snippets may be incomplete or out of date; open the source and check its date and context.",
+            "Search results do not confirm that the employer posted this role or that applications are still open.",
+            "The employer's identity, recruiter relationship, compensation, and working conditions have not been independently verified.",
+        ],
+        "before_apply": [
+            "Find the role on the employer's official careers site and confirm it is still open.",
+            "Check the recruiter and email domain against the employer's official website.",
+            "Confirm location, responsibilities, compensation, and employment type directly.",
+            "Do not pay application, training, or security fees; avoid sharing sensitive identity or banking data before verification.",
+        ],
+        "disclaimer": "These public search results are leads to inspect, not a fraud verdict or a safety guarantee.",
+    }
+
+
 @app.get("/")
 def home():
     return FileResponse(BACKEND_DIR / "static" / "index.html")
@@ -103,3 +150,33 @@ def search_jobs(
             "count": len(jobs), "jobs": jobs,
             "disclaimer": "Search results are not endorsements. Verify details with the employer before applying or paying.",
             "search_metadata": {"status": (data.get("search_metadata") or {}).get("status")}}
+
+
+@app.get("/api/dossier")
+def investigate_job(
+    company: str = Query(..., min_length=2, max_length=120),
+    title: str = Query(..., min_length=2, max_length=120),
+    location: str = Query("India", min_length=2, max_length=100),
+):
+    """Perform one user-triggered Google Search for public employer/listing context."""
+    api_key = os.getenv("SERPAPI_KEY", "").strip()
+    if not api_key or api_key.lower() in {"your_serpapi_key_here", "your_api_key", "placeholder"}:
+        raise HTTPException(status_code=503, detail="SerpApi is not configured.")
+    query = f'"{company}" "{title}" {location} jobs careers'
+    try:
+        response = requests.get(
+            SERPAPI_ENDPOINT,
+            params={"engine": "google", "q": query, "gl": "in", "hl": "en", "api_key": api_key},
+            timeout=25,
+        )
+        response.raise_for_status()
+        data = response.json()
+    except requests.Timeout:
+        raise HTTPException(status_code=504, detail="Evidence search timed out.")
+    except requests.RequestException:
+        raise HTTPException(status_code=502, detail="Evidence search could not reach SerpApi.")
+    except ValueError:
+        raise HTTPException(status_code=502, detail="SerpApi returned an invalid evidence response.")
+    if not isinstance(data, dict) or data.get("error"):
+        raise HTTPException(status_code=502, detail="SerpApi returned an evidence search error.")
+    return {"company": company, "title": title, "location": location, **normalize_dossier(data)}
